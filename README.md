@@ -128,6 +128,55 @@ cd ~/projects/my-product    # contains backend/, frontend/, mobile/, etc.
 /codewiki
 ```
 
+### Multi-Repo Setup
+
+CodeWiki discovers cross-repo relationships by scanning sibling directories. For this to work, **all repos must live under a single parent folder**.
+
+#### Required structure
+
+```
+my-product/                    # parent folder — run /codewiki from here
+├── backend/                   # git repo
+├── frontend/                  # git repo
+├── mobile-app/                # git repo
+├── admin-dashboard/           # git repo
+├── shared-libs/               # git repo (optional)
+└── infra/                     # git repo (optional)
+```
+
+Each subfolder is its own git repo. The parent folder doesn't need to be a git repo itself.
+
+#### Setting it up
+
+```bash
+mkdir -p ~/projects/my-product && cd ~/projects/my-product
+
+git clone git@github.com:your-org/backend.git
+git clone git@github.com:your-org/frontend.git
+git clone git@github.com:your-org/mobile-app.git
+git clone git@github.com:your-org/admin-dashboard.git
+# ... clone all repos that make up the product
+```
+
+#### What CodeWiki does with this
+
+When it detects multiple repos, it:
+
+1. **Inventories every repo** — identifies each folder's role (API server, web app, mobile app, comms service, etc.) from dependency files and project structure
+2. **Scans in priority order** — infrastructure and contracts first, then gateway, frontends, core business services, and finally supporting services
+3. **Manages context** — scans one repo at a time, writes findings to a scratch folder, carries only a compact summary forward. This means it works even on large projects without running out of context.
+4. **Maps cross-repo connections** — API calls from frontend to backend, shared types, event producers and consumers, service-to-service communication
+5. **Traces user flows across repos** — a single user action (like "sign up") might touch the mobile app, API gateway, user service, notification service, and billing service. CodeWiki traces the full chain.
+
+#### Where does the output go?
+
+For multi-repo projects, CodeWiki asks whether you want the `codewiki/` output:
+
+- **Inside the parent folder** — alongside your repos, as a shared knowledge base
+- **In its own dedicated repo** — so you can version and share it independently
+
+Either way, it generates a `CLAUDE.md` you can copy into whichever repo you're actively working in.
+
 ### Re-running
 
 Run `/codewiki` again anytime. It detects existing files and offers to:
