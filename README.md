@@ -236,6 +236,56 @@ Every future Claude Code session in this project starts with full context. No mo
 
 ---
 
+## Security
+
+CodeWiki runs entirely on your local machine inside Claude Code. Here's what it does and doesn't do:
+
+- **Reads your source code** — that's the whole point. It scans files, dependency manifests, configs, and entry points to understand your project.
+- **Writes only to `codewiki/` and `CLAUDE.md`** — output stays in your project directory (or a sibling directory you choose). It doesn't modify your source code.
+- **Fetches URLs you provide** — if you give it your landing page or docs URL during the product context phase, it will fetch those pages to extract product descriptions. It only fetches URLs you explicitly provide.
+- **No data leaves your machine** — CodeWiki doesn't phone home, collect telemetry, or send your code anywhere. It's a prompt file and a set of templates. There is no backend, no API, no analytics.
+- **No secrets in output** — CodeWiki documents environment variable *names*, not values. It won't write your API keys, database passwords, or tokens into the generated docs. That said, always review the output before committing to a public repo.
+
+---
+
+## Where CodeWiki Works Best (and Where It Doesn't)
+
+### Great fit
+
+- **Web applications** — backend APIs, frontend SPAs, full-stack apps. CodeWiki understands routes, endpoints, models, and auth flows across the stack.
+- **Mobile apps** — Flutter, React Native, Swift, Kotlin. It maps screens, navigation, state management, and API integration.
+- **Microservices** — this is where CodeWiki really shines. It traces service dependencies, async event chains, data ownership, and cross-service user flows that are nearly impossible to document by hand.
+- **Multi-repo products** — backend in one repo, frontend in another, mobile in a third. CodeWiki scans them all and maps the connections.
+- **SaaS products** — complex user flows, subscription logic, webhook integrations, admin dashboards. The kind of product where onboarding a new engineer takes weeks.
+- **Internal tools and admin platforms** — CRUD-heavy apps with role-based access, approval workflows, and integrations with third-party services.
+
+### Decent fit, with caveats
+
+- **Libraries and SDKs** — CodeWiki can document the API surface, but it's designed for *products* with user flows, not standalone packages. You'll get architecture and API docs, but user flow documentation won't be as useful.
+- **CLI tools** — works for mapping commands, flags, and internal structure, but the user flow model (screens, pages, API calls) doesn't map as naturally.
+- **Data pipelines and ETL** — CodeWiki can document the services and their connections, but it doesn't have specialized templates for DAGs, scheduling, or data lineage.
+
+### Not a great fit
+
+- **Single-file scripts or utilities** — if your project is a handful of files, CodeWiki is overkill. Just write the CLAUDE.md by hand.
+- **Machine learning model repos** — training pipelines, notebooks, experiment configs. CodeWiki doesn't understand model architectures, hyperparameters, or dataset structures.
+- **Infrastructure-only repos** — pure Terraform, Helm charts, or Ansible playbooks without application code. CodeWiki is built around application architecture, not infrastructure-as-code.
+- **Massive monoliths (500k+ lines)** — CodeWiki manages context carefully, but extremely large single-repo codebases may hit Claude's context limits before the scan completes. Multi-repo projects handle this better because each repo is scanned independently.
+
+---
+
+## Disclaimer
+
+CodeWiki is a prompt-based skill — it guides Claude's behavior but doesn't guarantee identical output every time. Results depend on Claude's interpretation of your codebase, the quality of product context you provide, and the model version you're running.
+
+- **Review before committing.** Always read the generated docs before pushing to a shared or public repo. While CodeWiki avoids writing secret values, it may reference internal service names, endpoint paths, or architecture details you'd prefer to keep private.
+- **Not a substitute for real documentation.** CodeWiki gives you a strong starting point and keeps it maintainable. But domain nuance, decision rationale, and institutional knowledge still need a human.
+- **Accuracy varies by project complexity.** Straightforward web apps produce highly accurate output. Complex event-driven microservices may need more corrections during the interactive confirmation steps — that's why CodeWiki asks you to verify before generating.
+
+---
+
 ## License
 
-MIT
+MIT — use it however you want. Personal projects, commercial products, modify it, redistribute it, sell something built on top of it. No attribution required (but appreciated).
+
+See [LICENSE](LICENSE) for the full text.
